@@ -406,6 +406,7 @@ function handleBarberLogin(){
   STATE.session = { type:'barbeiro', id: barber.id, name: barber.name };
   STATE.agendaDate = todayISO();
   renderStaffApp('agenda');
+}
 
 function logout(){ STATE.session = null; renderStaffLogin(); }
 
