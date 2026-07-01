@@ -116,11 +116,23 @@
   <div class="loading-dot">Carregando…</div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="loading-dot">Carregando...</div>
+</div>
+
 <script>
-/* ============ CONEXÃO DO SUPABASE ============ */
-const SUPABASE_URL = "https://pwbezybolmcmxkhlrwla.supabase.co";
-const SUPABASE_KEY = "sb_publishable_49LRg9PEBlVGXsFG8R_vAQ_CZuwy0SD";
-const supabase = supabasejs.createClient(SUPABASE_URL, SUPABASE_KEY);
+  /* ============ CONEXÃO DO SUPABASE ============ */
+  const SUPABASE_URL = "https://pwbezybolmcmxkhlrwla.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_49LRg9PEB1VGXsFG8R_vAQ_CZuwy0SD";
+  
+  // ATENÇÃO AQUI: Mudamos para window.Supabase para garantir que o Chrome ache a biblioteca!
+  const supabase = window.Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  /* ============ CONFIG ============ */
+  const SLOT_INTERVAL = 30;
 
   
     /* ============ CONFIG ============ */
