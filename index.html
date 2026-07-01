@@ -117,7 +117,13 @@
 </div>
 
 <script>
-/* ============ CONFIG ============ */
+/* ============ CONEXÃO DO SUPABASE ============ */
+const SUPABASE_URL = "https://pwbezybolmcmxkhlrwla.supabase.co";
+const SUPABASE_KEY = "sb_publishable_49LRg9PEBlVGXsFG8R_vAQ_CZuwy0SD";
+const supabase = supabasejs.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  
+    /* ============ CONFIG ============ */
 const SLOT_INTERVAL = 30;
 const SLOT_START = "09:00";
 const SLOT_END = "19:00";
@@ -129,10 +135,6 @@ const DEFAULT_SERVICES = [
   {id:'s3', name:'Corte + Barba', price:55}
 ];
 
-/* ============ CONEXÃO DO SUPABASE ============ */
-const SUPABASE_URL = "https://pwbezybolmcmxkhlrwla.supabase.co";
-const SUPABASE_KEY = "sb_publishable_49LRg9PEBlVGXsFG8R_vAQ_CZuwy0SD";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* ============ FUNÇÕES ADAPTADAS PARA O BANCO DE DADOS (SUPABASE) ============ */
 async function sGet(key){
