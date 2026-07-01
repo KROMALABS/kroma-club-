@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kroma — Sistema de Agendamento</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght=500;600;700&family=Inter:wght=400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#16140f;
@@ -120,9 +120,9 @@
   /* ============ CONEXÃO DO SUPABASE ============ */
   const SUPABASE_URL = "https://pwbezybolmcmxkhlrwla.supabase.co";
   const SUPABASE_KEY = "sb_publishable_49LRg9PEB1VGXsFG8R_vAQ_CZuwy0SD";
-  
-  // Aqui usamos o supabase padrão da biblioteca oficial v2
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // Renomeado para supabaseClient para não conflitar com o objeto global "supabase" da lib
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   /* ============ CONFIG ============ */
 const SLOT_INTERVAL = 30;
@@ -140,7 +140,7 @@ const DEFAULT_SERVICES = [
 /* ============ FUNÇÕES ADAPTADAS PARA O BANCO DE DADOS (SUPABASE) ============ */
 async function sGet(key){
   try{ 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('kroma_storage')
       .select('value')
       .eq('key', key)
@@ -156,7 +156,7 @@ async function sGet(key){
 
 async function sSet(key, value){
   try{ 
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('kroma_storage')
       .upsert({ key: key, value: value }, { onConflict: 'key' });
 
@@ -286,7 +286,7 @@ function renderLanding(){
       <input id="ln-id" placeholder="Código da loja (ex: kroma-a1b2)">
       <button class="btn btn-outline" onclick="handleGoToShop()">Entrar</button>
     </div>
-    <p class="footer-note">Protótipo funcional — dados salvos de forma 100% segura na nuvem com Supabase.</p>
+    <p class="footer-note">Protótipo funcional — dados salvos na nuvem com Supabase.</p>
   `;
 }
 
@@ -559,7 +559,6 @@ async function deleteAppt(id){
   renderStaffApp('agenda');
 }
 
-/* (O restante das funções internas permanece idêntico, gerido pelo novo sGet/sSet assíncronos) */
 function tplCaixa(){
   const shop = STATE.shop;
   const dates = [todayISO(), tomorrowISO()];
@@ -827,7 +826,7 @@ function renderClientSuccess(appt, barber, servico){
       <p class="muted" style="margin-bottom:16px;">${displayDate(appt.date)} às <strong>${appt.hora}</strong><br>${esc(servico.name)} com ${esc(barber.name)}</p>
       ${shopZap ? `
         <p class="muted" style="margin-bottom:10px;">Quer avisar a barbearia agora? Isso abre seu WhatsApp com uma mensagem pronta — você quem envia.</p>
-        <a class="btn btn-primary" style="display:block;text-decoration:none;" href="https://wa.me/${shopZap}?text=${msg}\" target=\"_blank\">Enviar confirmação no WhatsApp</a>
+        <a class="btn btn-primary" style="display:block;text-decoration:none;" href="https://wa.me/${shopZap}?text=${msg}" target="_blank">Enviar confirmação no WhatsApp</a>
       ` : `<p class="muted">Guarde a data e o horário. Nos vemos lá!</p>`}
       <button class="btn btn-outline" style="margin-top:10px" onclick="STATE.clientSel={barberId:null,serviceId:null,date:todayISO(),hora:null}; renderCliente();">Fazer novo agendamento</button>
     </div>
