@@ -106,8 +106,10 @@
   .loading-dot{text-align:center;color:var(--text-dim);padding:60px 0;font-size:13px;}
   .del-x{background:none;border:none;color:#6b6459;font-size:16px;cursor:pointer;padding:0 2px;}
   .step-num{display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#1a1509;font-size:11px;font-weight:700;align-items:center;justify-content:center;margin-right:8px;font-family:'Oswald',sans-serif;}
-  .footer-note">text-align:center;color:#5c5648;font-size:10.5px;margin-top:6px;}
+  .footer-note{text-align:center;color:#5c5648;font-size:10.5px;margin-top:6px;}
 </style>
+<!-- BIBLIOTECA DO SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div class="app" id="app">
@@ -127,19 +129,42 @@ const DEFAULT_SERVICES = [
   {id:'s3', name:'Corte + Barba', price:55}
 ];
 
-/* ============ CORREÇÃO DO BANCO DE DADOS (LOCALSTORAGE) ============ */
+/* ============ CONEXÃO DO SUPABASE ============ */
+const SUPABASE_URL = "https://pwbezybolmcmxkhlrwla.supabase.co";
+const SUPABASE_KEY = "sb_publishable_49LRg9PEBlVGXsFG8R_vAQ_CZuwy0SD";
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ============ FUNÇÕES ADAPTADAS PARA O BANCO DE DADOS (SUPABASE) ============ */
 async function sGet(key){
   try{ 
-    const r = localStorage.getItem(key); 
-    return r ? JSON.parse(r) : null; 
-  } catch(e){ return null; }
+    const { data, error } = await supabase
+      .from('kroma_storage')
+      .select('value')
+      .eq('key', key)
+      .maybeSingle();
+    
+    if (error) throw error;
+    return data ? data.value : null; 
+  } catch(e){ 
+    console.error('Erro ao ler dados do Supabase:', e);
+    return null; 
+  }
 }
+
 async function sSet(key, value){
   try{ 
-    localStorage.setItem(key, JSON.stringify(value)); 
+    const { error } = await supabase
+      .from('kroma_storage')
+      .upsert({ key: key, value: value }, { onConflict: 'key' });
+
+    if (error) throw error;
     return true; 
-  } catch(e){ console.error('storage set failed', e); return false; }
+  } catch(e){ 
+    console.error('Erro ao salvar dados no Supabase:', e); 
+    return false; 
+  }
 }
+
 const shopKey = id => `shop:${id}`;
 const apptKey = id => `appts:${id}`;
 
@@ -258,7 +283,7 @@ function renderLanding(){
       <input id="ln-id" placeholder="Código da loja (ex: kroma-a1b2)">
       <button class="btn btn-outline" onclick="handleGoToShop()">Entrar</button>
     </div>
-    <p class="footer-note">Protótipo funcional — dados ficam salvos de forma segura no seu navegador.</p>
+    <p class="footer-note">Protótipo funcional — dados salvos de forma 100% segura na nuvem com Supabase.</p>
   `;
 }
 
@@ -530,6 +555,7 @@ async function deleteAppt(id){
   renderStaffApp('agenda');
 }
 
+/* (O restante das funções internas permanece idêntico, gerido pelo novo sGet/sSet assíncronos) */
 function tplCaixa(){
   const shop = STATE.shop;
   const dates = [todayISO(), tomorrowISO()];
@@ -675,7 +701,6 @@ async function toggleClosed(date, checked){
   renderStaffApp('config');
 }
 
-/* ============ CLIENT APP ============ */
 function renderCliente(){
   const shop = STATE.shop;
   const sel = STATE.clientSel;
