@@ -108,17 +108,10 @@
   .step-num{display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#1a1509;font-size:11px;font-weight:700;align-items:center;justify-content:center;margin-right:8px;font-family:'Oswald',sans-serif;}
   .footer-note{text-align:center;color:#5c5648;font-size:10.5px;margin-top:6px;}
 </style>
-<!-- BIBLIOTECA DO SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-<div class="app" id="app">
-  <div class="loading-dot">Carregando…</div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
 <div class="app" id="app">
   <div class="loading-dot">Carregando...</div>
 </div>
@@ -128,14 +121,10 @@
   const SUPABASE_URL = "https://pwbezybolmcmxkhlrwla.supabase.co";
   const SUPABASE_KEY = "sb_publishable_49LRg9PEB1VGXsFG8R_vAQ_CZuwy0SD";
   
-  // ATENÇÃO AQUI: Mudamos para window.Supabase para garantir que o Chrome ache a biblioteca!
-  const supabase = window.Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  // Aqui usamos o supabase padrão da biblioteca oficial v2
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   /* ============ CONFIG ============ */
-  const SLOT_INTERVAL = 30;
-
-  
-    /* ============ CONFIG ============ */
 const SLOT_INTERVAL = 30;
 const SLOT_START = "09:00";
 const SLOT_END = "19:00";
