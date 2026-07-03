@@ -1,153 +1,506 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Kroma Master</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kroma Master</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<style>
-body{
-  font-family: Arial;
-  background:#0b0f14;
-  color:white;
-  padding:20px;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-h1{
-  color:#00d4ff;
-}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #070707;
+      color: #ffffff;
+    }
 
-.company-card{
-  background:#121a24;
-  padding:15px;
-  margin:10px 0;
-  border-radius:10px;
-  border:1px solid #1f2a3a;
-}
-.status{
-  font-weight:bold;
-}
-</style>
+    .page {
+      min-height: 100vh;
+      padding: 32px;
+      background:
+        radial-gradient(circle at top left, rgba(255, 180, 80, 0.14), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.06), transparent 30%),
+        #070707;
+    }
+
+    .login-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 430px;
+      background: rgba(20, 20, 20, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 20px 80px rgba(0,0,0,0.45);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255, 185, 90, 0.12);
+      color: #ffbf70;
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+      letter-spacing: -1px;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    p {
+      color: #b8b8b8;
+      line-height: 1.5;
+    }
+
+    input {
+      width: 100%;
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: #111;
+      color: #fff;
+      outline: none;
+      font-size: 15px;
+    }
+
+    input:focus {
+      border-color: #ffb45c;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      border-radius: 14px;
+      padding: 13px 16px;
+      font-weight: 700;
+      background: #ffb45c;
+      color: #141414;
+      font-size: 15px;
+    }
+
+    .login-card button {
+      width: 100%;
+      margin-top: 16px;
+    }
+
+    .error {
+      margin-top: 14px;
+      color: #ff7777;
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+
+    .topbar {
+      max-width: 1180px;
+      margin: 0 auto 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .topbar h1 {
+      font-size: 34px;
+    }
+
+    .logout {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .grid {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .metric-card,
+    .company-card {
+      background: rgba(20,20,20,0.92);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 22px;
+      padding: 20px;
+    }
+
+    .metric-card small {
+      color: #aaa;
+    }
+
+    .metric-card strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 28px;
+    }
+
+    .companies-section {
+      max-width: 1180px;
+      margin: 28px auto 0;
+    }
+
+    .companies-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .company-card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+
+    .company-card p {
+      margin: 6px 0;
+      color: #cfcfcf;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      margin-bottom: 12px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .status.active,
+    .status.trial {
+      color: #9dffbd;
+      background: rgba(80,255,140,0.12);
+    }
+
+    .status.expired,
+    .status.blocked {
+      color: #ff8b8b;
+      background: rgba(255,80,80,0.12);
+    }
+
+    .empty {
+      padding: 24px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.06);
+      color: #bbb;
+    }
+
+    pre {
+      overflow: auto;
+      padding: 16px;
+      border-radius: 14px;
+      background: #111;
+      color: #ff9f9f;
+      font-size: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .grid,
+      .companies-list {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .page {
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <div id="app"></div>
 
-<h1>🔥 KROMA MASTER</h1>
+  <script>
+    const SUPABASE_URL = "https://pwbezybolmcmxkhlrwla.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_49LRg9PEBlVGXsFG8R_vAQ_CZuwy0SD";
 
-<div id="companiesList">Carregando empresas...</div>
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const app = document.getElementById("app");
 
-<script>
-/* ================================
-   1. SUPABASE CONFIG
-================================ */
-const SUPABASE_URL = "https://pwbezybolmcmxkhlrwla.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_49LRg9PEBlVGXsFG8R_vAQ_CZuwy0SD";
+    function renderLogin() {
+      app.innerHTML = `
+        <div class="login-wrap">
+          <div class="login-card">
+            <span class="badge">Kroma Labs</span>
+            <h1>Kroma Master</h1>
+            <p>Entre com seu acesso de CEO para controlar as empresas da Kroma Labs.</p>
 
-const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            <input id="email" type="email" placeholder="Seu e-mail" autocomplete="email">
+            <input id="password" type="password" placeholder="Sua senha" autocomplete="current-password">
 
+            <button onclick="loginMaster()">Entrar no Master</button>
 
-/* ================================
-   2. DIAS RESTANTES
-================================ */
-function getDiasRestantes(dataFim){
-  if(!dataFim) return 0;
+            <div id="loginError" class="error"></div>
+          </div>
+        </div>
+      `;
+    }
 
-  const hoje = new Date();
-  const fim = new Date(dataFim);
+    async function loginMaster() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const errorBox = document.getElementById("loginError");
 
-  const diff = fim - hoje;
+      errorBox.innerText = "";
 
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
-}
+      if (!email || !password) {
+        errorBox.innerText = "Preencha e-mail e senha.";
+        return;
+      }
 
+      const { error } = await db.auth.signInWithPassword({
+        email,
+        password
+      });
 
-/* ================================
-   3. STATUS DA EMPRESA
-================================ */
-function calcularStatus(c){
-  const hoje = new Date();
+      if (error) {
+        errorBox.innerText = "E-mail ou senha inválidos.";
+        return;
+      }
 
-  if(c.status === "blocked") return "Bloqueado";
+      await liberarMaster();
+    }
 
-  if(c.trial_end_date && new Date(c.trial_end_date) > hoje && !c.subscription_start_date){
-    return "Trial";
-  }
+    async function liberarMaster() {
+      const { data: sessionData, error: sessionError } = await db.auth.getSession();
 
-  if(c.trial_end_date && new Date(c.trial_end_date) < hoje && !c.subscription_start_date){
-    return "Trial Expirado";
-  }
+      if (sessionError || !sessionData.session) {
+        renderLogin();
+        return;
+      }
 
-  if(c.subscription_end_date && new Date(c.subscription_end_date) < hoje){
-    return "Expirado";
-  }
+      const authUser = sessionData.session.user;
 
-  return "Ativo";
-}
+      const { data: profile, error } = await db
+        .from("users")
+        .select("id, name, email, role, company_id, auth_user_id")
+        .eq("auth_user_id", authUser.id)
+        .single();
 
+      if (error || !profile) {
+        await db.auth.signOut();
 
-/* ================================
-   4. BUSCAR EMPRESAS
-================================ */
-async function carregarEmpresas(){
+        app.innerHTML = `
+          <div class="login-wrap">
+            <div class="login-card">
+              <h1>Acesso não encontrado</h1>
+              <p>Seu login existe no Supabase Auth, mas ainda não foi vinculado na tabela users da Kroma.</p>
+              <div class="error">${error ? JSON.stringify(error, null, 2) : ""}</div>
+              <button onclick="renderLogin()">Voltar</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
 
-  const { data, error } = await client
-    .from("companies")
-    .select("*")
-    .order("created_at", { ascending:false });
+      if (profile.role !== "master_kroma") {
+        await db.auth.signOut();
 
-  if(error){
-    console.error(error);
-    document.getElementById("companiesList").innerHTML = "Erro ao carregar";
-    return;
-  }
+        app.innerHTML = `
+          <div class="login-wrap">
+            <div class="login-card">
+              <h1>Acesso negado</h1>
+              <p>Este usuário existe, mas não tem permissão de Master.</p>
+              <p>Na tabela users, o campo role precisa estar exatamente assim:</p>
+              <pre>master_kroma</pre>
+              <button onclick="renderLogin()">Voltar</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
 
-  renderEmpresas(data);
-}
+      await renderMaster(profile);
+    }
 
+    async function renderMaster(profile) {
+      app.innerHTML = `
+        <div class="page">
+          <div class="topbar">
+            <div>
+              <span class="badge">Painel CEO</span>
+              <h1>Painel Master Kroma</h1>
+              <p>Bem-vindo, ${profile.name || "CEO Kroma"}.</p>
+            </div>
 
-/* ================================
-   5. RENDER UI
-================================ */
-function renderEmpresas(empresas){
+            <button class="logout" onclick="logoutMaster()">Sair</button>
+          </div>
 
-  const container = document.getElementById("companiesList");
-  container.innerHTML = "";
+          <div class="grid">
+            <div class="metric-card">
+              <small>Total de empresas</small>
+              <strong id="metricTotal">0</strong>
+            </div>
 
-  empresas.forEach(c => {
+            <div class="metric-card">
+              <small>Ativas</small>
+              <strong id="metricActive">0</strong>
+            </div>
 
-    const status = calcularStatus(c);
-    const dias = getDiasRestantes(
-      c.subscription_end_date || c.trial_end_date
-    );
+            <div class="metric-card">
+              <small>Trial</small>
+              <strong id="metricTrial">0</strong>
+            </div>
 
-    const card = document.createElement("div");
-    card.className = "company-card";
+            <div class="metric-card">
+              <small>Expiradas/Bloqueadas</small>
+              <strong id="metricProblem">0</strong>
+            </div>
+          </div>
 
-    card.innerHTML = `
-      <h2>${c.name || "Sem nome"}</h2>
+          <div class="companies-section">
+            <h2>Empresas</h2>
+            <div id="companiesList" class="companies-list">
+              <div class="empty">Carregando empresas...</div>
+            </div>
+          </div>
+        </div>
+      `;
 
-      <p class="status">Status: ${status}</p>
+      await carregarEmpresas();
+    }
 
-      <p>Dias restantes: <b>${dias}</b></p>
+    function diasRestantes(dataFim) {
+      if (!dataFim) return "—";
 
-      <p>Plano: ${c.plan || "—"}</p>
+      const hoje = new Date();
+      const fim = new Date(dataFim);
+      const diff = Math.ceil((fim - hoje) / (1000 * 60 * 60 * 24));
 
-      <small>ID: ${c.id}</small>
-    `;
+      return diff;
+    }
 
-    container.appendChild(card);
-  });
-}
+    function calcularStatusEmpresa(company) {
+      const hoje = new Date();
 
+      if (company.status === "blocked") return "blocked";
 
-/* ================================
-   6. INIT
-================================ */
-document.addEventListener("DOMContentLoaded", ()=>{
-  carregarEmpresas();
-});
-</script>
+      if (company.subscription_end_date && new Date(company.subscription_end_date) < hoje) {
+        return "expired";
+      }
 
+      if (company.trial_end_date && !company.subscription_end_date && new Date(company.trial_end_date) < hoje) {
+        return "expired";
+      }
+
+      if (company.trial_end_date && !company.subscription_end_date) {
+        return "trial";
+      }
+
+      if (company.status === "active") return "active";
+
+      return company.status || "active";
+    }
+
+    function labelStatus(status) {
+      const labels = {
+        active: "Ativa",
+        trial: "Trial",
+        expired: "Expirada",
+        blocked: "Bloqueada",
+        pending: "Pendente"
+      };
+
+      return labels[status] || status;
+    }
+
+    async function carregarEmpresas() {
+      const box = document.getElementById("companiesList");
+
+      const { data, error } = await db
+        .from("companies")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        box.innerHTML = `
+          <div class="empty">
+            <p style="color:#ff7777;">Erro ao carregar empresas.</p>
+            <pre>${JSON.stringify(error, null, 2)}</pre>
+          </div>
+        `;
+        return;
+      }
+
+      const companies = data || [];
+
+      document.getElementById("metricTotal").innerText = companies.length;
+
+      let active = 0;
+      let trial = 0;
+      let problem = 0;
+
+      companies.forEach(company => {
+        const status = calcularStatusEmpresa(company);
+
+        if (status === "active") active++;
+        if (status === "trial") trial++;
+        if (status === "expired" || status === "blocked") problem++;
+      });
+
+      document.getElementById("metricActive").innerText = active;
+      document.getElementById("metricTrial").innerText = trial;
+      document.getElementById("metricProblem").innerText = problem;
+
+      if (companies.length === 0) {
+        box.innerHTML = `<div class="empty">Nenhuma empresa cadastrada ainda.</div>`;
+        return;
+      }
+
+      box.innerHTML = companies.map(company => {
+        const status = calcularStatusEmpresa(company);
+        const fim = company.subscription_end_date || company.trial_end_date;
+        const dias = diasRestantes(fim);
+
+        return `
+          <div class="company-card">
+            <span class="status ${status}">${labelStatus(status)}</span>
+
+            <h3>${company.name || "Empresa sem nome"}</h3>
+
+            <p><strong>Plano:</strong> ${company.plan || "—"}</p>
+            <p><strong>Dias restantes:</strong> ${dias}</p>
+            <p><strong>Expira em:</strong> ${fim ? new Date(fim).toLocaleDateString("pt-BR") : "Sem data"}</p>
+            <p><strong>Dono:</strong> ${company.owner_name || "—"}</p>
+            <p><strong>E-mail:</strong> ${company.owner_email || "—"}</p>
+            <p><strong>Telefone:</strong> ${company.owner_phone || "—"}</p>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function logoutMaster() {
+      await db.auth.signOut();
+      renderLogin();
+    }
+
+    document.addEventListener("DOMContentLoaded", liberarMaster);
+  </script>
 </body>
 </html>
