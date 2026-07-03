@@ -26,8 +26,8 @@
    Sem modo demo. Produção: Supabase Auth + role KROMA_MASTER + RLS.
 */
 const SUPABASE_URL = "https://pwbezybolmcmxkhlrwla.supabase.co";
-const SUPABASE_KEY = "sb_publishable_49LRg9PEBlVGXsFG8R_vAQ_CZuwy0SD";
-const MASTER_ACCESS_CODE = "Stanley753951@";
+const SUPABASE_KEY = "COLOQUE_AQUI_A_CHAVE_PUBLISHABLE_COPIADA_DO_SUPABASE";
+const MASTER_ACCESS_CODE = "kroma-ceo-2026";
 const MAIN_APP_FILE = "index.html";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const app = document.getElementById('app');
@@ -353,6 +353,66 @@ function exportData(){
   toast('Backup técnico real gerado.');
 }
 function logoutMaster(){ localStorage.removeItem('kroma_master_ok'); STATE.authed=false; renderGate(); }
+
+
+// ===== KROMA SUBSCRIPTION ENGINE (CORE) =====
+function getToday(){
+  return new Date();
+}
+
+function diffDays(date){
+  if(!date) return null;
+  return Math.ceil((new Date(date) - new Date())/(1000*60*60*24));
+}
+
+function getCompanyStatus(c){
+  const now = getToday();
+
+  if(c.status === 'blocked') return 'blocked';
+
+  if(c.trial_end_date && now > new Date(c.trial_end_date)){
+    if(!c.subscription_end_date) return 'expired';
+  }
+
+  if(c.subscription_end_date && now > new Date(c.subscription_end_date)){
+    return 'expired';
+  }
+
+  return c.status || 'active';
+}
+
+function getRemainingDays(c){
+  if(c.subscription_end_date){
+    return diffDays(c.subscription_end_date);
+  }
+  if(c.trial_end_date){
+    return diffDays(c.trial_end_date);
+  }
+  return null;
+}
+
+function formatCompanyLabel(c){
+  const status = getCompanyStatus(c);
+  const days = getRemainingDays(c);
+
+  let badge = '';
+  if(status === 'trial') badge = `🟡 Trial (${days ?? 0}d)`;
+  if(status === 'active') badge = `🟢 Ativo`;
+  if(status === 'expired') badge = `🔴 Expirado`;
+  if(status === 'blocked') badge = `⛔ Bloqueado`;
+
+  return badge;
+}
+
+function enforceSubscription(c){
+  const status = getCompanyStatus(c);
+  if(status === 'expired'){
+    c.status = 'expired';
+  }
+  return c;
+}
+// ===== END SUBSCRIPTION ENGINE =====
+
 
 (function init(){ STATE.authed=localStorage.getItem('kroma_master_ok')==='1'; if(!STATE.authed) renderGate(); else loadMasterData(); })();
 </script>
